@@ -1,0 +1,684 @@
+<?xml version="1.0" ?>
+<mujoco model="mobile_fr3_duo_v0_2">
+  <compiler angle="radian" meshdir="assets" autolimits="true" balanceinertia="true"/>
+  <!-- impratio: with an elliptic cone the default of 1 leaves friction constraints as soft
+       as normal ones, and a grasped SSD sled creeps out of the fingers at 9 deg/s while
+       nowhere near the friction limit. 100 brings that to 0.03 deg/s. -->
+  <option timestep="0.001" integrator="implicitfast" cone="elliptic" impratio="100"/>
+  <visual>
+    <global offwidth="1600" offheight="900" azimuth="140" elevation="-20"/>
+    <quality shadowsize="4096"/>
+    <headlight diffuse="0.5 0.5 0.5" ambient="0.3 0.3 0.3" specular="0.1 0.1 0.1"/>
+  </visual>
+  <default>
+    <default class="visual">
+      <geom type="mesh" contype="0" conaffinity="0" group="2" material="franka_white"/>
+    </default>
+    <default class="collision">
+      <geom type="mesh" group="3" rgba="1 0.4 0 0.4" condim="4" solref="0.004 1"/>
+    </default>
+    <!-- Friction is split on purpose. MuJoCo takes the element-wise MAX of a contact
+         pair, so a sled grippy enough to hold is also a sled that will not slide out of its
+         bay. Low here (0.4-0.5, drive rails) and high on the finger pads (1.5) makes
+         pad-vs-sled 1.5 and sled-vs-deck 0.5, so the grip beats the drag by about 4x. -->
+    <default class="rack">
+      <geom type="box" group="0" contype="1" conaffinity="7" condim="3" solref="0.004 1" friction="0.4 0.005 0.0001"/>
+    </default>
+    <default class="rack_deco">
+      <geom type="box" group="0" contype="0" conaffinity="0" mass="0"/>
+    </default>
+    <default class="ssd">
+      <geom type="box" group="0" contype="1" conaffinity="7" condim="4" solref="0.004 1" friction="0.5 0.01 0.001" material="ssd_body"/>
+    </default>
+    <default class="ssd_deco">
+      <geom type="box" group="0" contype="0" conaffinity="0" mass="0"/>
+    </default>
+  </default>
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1="0.22 0.24 0.27" rgb2="0.27 0.29 0.33"/>
+    <material name="grid" texture="grid" texrepeat="12 12" reflectance="0.05"/>
+    <texture name="sky" type="skybox" builtin="gradient" rgb1="0.35 0.42 0.52" rgb2="0.05 0.06 0.08" width="256" height="256"/>
+    <material name="franka_white" rgba="0.9 0.9 0.92 1" specular="0.3" shininess="0.3"/>
+    <mesh name="fr3_duo_mount_v0_3_collision_fr3_duo_cover" file="fr3_duo_mount_v0_3_collision_fr3_duo_cover.stl"/>
+    <mesh name="fr3_duo_mount_v0_3_collision_fr3_duo_mount" file="fr3_duo_mount_v0_3_collision_fr3_duo_mount.stl"/>
+    <mesh name="fr3_duo_mount_v0_3_visual_fr3_duo_cover" file="fr3_duo_mount_v0_3_visual_fr3_duo_cover.obj"/>
+    <mesh name="fr3_duo_mount_v0_3_visual_fr3_duo_mount" file="fr3_duo_mount_v0_3_visual_fr3_duo_mount.obj"/>
+    <mesh name="fr3v2_1_collision_link0" file="fr3v2_1_collision_link0.stl"/>
+    <mesh name="fr3v2_1_collision_link1" file="fr3v2_1_collision_link1.stl"/>
+    <mesh name="fr3v2_1_collision_link2" file="fr3v2_1_collision_link2.stl"/>
+    <mesh name="fr3v2_1_collision_link3" file="fr3v2_1_collision_link3.stl"/>
+    <mesh name="fr3v2_1_collision_link4" file="fr3v2_1_collision_link4.stl"/>
+    <mesh name="fr3v2_1_collision_link5" file="fr3v2_1_collision_link5.stl"/>
+    <mesh name="fr3v2_1_collision_link6" file="fr3v2_1_collision_link6.stl"/>
+    <mesh name="fr3v2_1_collision_link7" file="fr3v2_1_collision_link7.stl"/>
+    <mesh name="fr3v2_1_visual_link0" file="fr3v2_1_visual_link0.obj"/>
+    <mesh name="fr3v2_1_visual_link1" file="fr3v2_1_visual_link1.obj"/>
+    <mesh name="fr3v2_1_visual_link2" file="fr3v2_1_visual_link2.obj"/>
+    <mesh name="fr3v2_1_visual_link3" file="fr3v2_1_visual_link3.obj"/>
+    <mesh name="fr3v2_1_visual_link4" file="fr3v2_1_visual_link4.obj"/>
+    <mesh name="fr3v2_1_visual_link5" file="fr3v2_1_visual_link5.obj"/>
+    <mesh name="fr3v2_1_visual_link6" file="fr3v2_1_visual_link6.obj"/>
+    <mesh name="fr3v2_1_visual_link7" file="fr3v2_1_visual_link7.obj"/>
+    <mesh name="franka_hand_white_collision_hand" file="franka_hand_white_collision_hand.stl"/>
+    <mesh name="franka_hand_white_visual_finger" file="franka_hand_white_visual_finger.obj"/>
+    <mesh name="franka_hand_white_visual_hand" file="franka_hand_white_visual_hand.obj"/>
+    <mesh name="franka_head_v0_2_collision_franka_head" file="franka_head_v0_2_collision_franka_head.stl"/>
+    <mesh name="franka_head_v0_2_visual_franka_head" file="franka_head_v0_2_visual_franka_head.obj"/>
+    <mesh name="franka_spine_v0_1_collision_franka_spine" file="franka_spine_v0_1_collision_franka_spine.stl"/>
+    <mesh name="franka_spine_v0_1_visual_franka_spine" file="franka_spine_v0_1_visual_franka_spine.obj"/>
+    <mesh name="tmrv0_2_collision_tmrv0_2" file="tmrv0_2_collision_tmrv0_2.stl"/>
+    <mesh name="tmrv0_2_visual_tmrv0_2" file="tmrv0_2_visual_tmrv0_2.obj"/>
+    <material name="rack_frame" rgba="0.17 0.18 0.20 1" specular="0.5" shininess="0.4"/>
+    <material name="rack_panel" rgba="0.11 0.12 0.14 1" specular="0.3" shininess="0.3"/>
+    <material name="rack_rail" rgba="0.32 0.33 0.36 1" specular="0.6" shininess="0.5"/>
+    <material name="server_chassis" rgba="0.20 0.21 0.23 1" specular="0.4" shininess="0.3"/>
+    <material name="server_bezel" rgba="0.27 0.28 0.31 1" specular="0.5" shininess="0.4"/>
+    <material name="server_vent" rgba="0.09 0.10 0.11 1" specular="0.1"/>
+    <material name="blank_panel" rgba="0.15 0.16 0.18 1" specular="0.2"/>
+    <material name="shelf_body" rgba="0.23 0.24 0.27 1" specular="0.5" shininess="0.4"/>
+    <material name="ssd_body" rgba="0.42 0.44 0.47 1" specular="0.7" shininess="0.6"/>
+    <material name="ssd_handle" rgba="0.13 0.14 0.16 1" specular="0.4" shininess="0.3"/>
+    <material name="ssd_label" rgba="0.88 0.88 0.90 1" specular="0.1"/>
+    <material name="led_green" rgba="0.10 0.95 0.35 1" emission="0.9"/>
+    <material name="led_amber" rgba="1 0.62 0.05 1" emission="0.9"/>
+    <material name="led_blue" rgba="0.20 0.60 1 1" emission="0.9"/>
+    <material name="led_off" rgba="0.07 0.08 0.09 1" specular="0.2"/>
+  </asset>
+  <worldbody>
+    <light pos="0 0 4" dir="0 0 -1" directional="true" diffuse="0.6 0.6 0.6"/>
+    <light pos="2 2 3" dir="-0.5 -0.5 -1" diffuse="0.4 0.4 0.4"/>
+    <light pos="0.35 0 2.35" dir="0.51 0 -0.86" diffuse="0.55 0.55 0.6" specular="0.15 0.15 0.15"/>
+    <light pos="0.7 0 1.15" dir="1 0 -0.15" diffuse="0.25 0.25 0.28" specular="0.05 0.05 0.05"/>
+    <geom name="floor" type="plane" size="8 8 0.05" material="grid" contype="1" conaffinity="6"/>
+    <camera name="overview" pos="2.2 -1.8 1.9" xyaxes="0.63 0.78 0 -0.33 0.27 0.90"/>
+    <camera name="rack_view" pos="0.30 -1.35 1.35" xyaxes="0.96 0.28 0 -0.10 0.34 0.94" fovy="48"/>
+    <camera name="teleop_view" pos="2.75 -1.05 1.55" mode="targetbody" target="fr3_duo_mount_origin" fovy="42"/>
+    <body name="target_left" mocap="true" pos="0.9 0 1.1">
+      <geom contype="0" conaffinity="0" group="1" type="mesh" rgba="0.15 0.72 1 0.4" mass="0" mesh="franka_hand_white_visual_hand" pos="0 0 -0.1034"/>
+      <geom contype="0" conaffinity="0" group="1" type="mesh" rgba="0.15 0.72 1 0.4" mass="0" mesh="franka_hand_white_visual_finger" pos="0 0.02 -0.045"/>
+      <geom contype="0" conaffinity="0" group="1" type="mesh" rgba="0.15 0.72 1 0.4" mass="0" mesh="franka_hand_white_visual_finger" pos="0 -0.02 -0.045" quat="0 0 0 1"/>
+      <geom type="sphere" size="0.009" mass="0" rgba="0.15 0.72 1 1" contype="0" conaffinity="0" group="1"/>
+    </body>
+    <body name="target_right" mocap="true" pos="0.9 0 1.1">
+      <geom contype="0" conaffinity="0" group="1" type="mesh" rgba="1 0.5 0.12 0.4" mass="0" mesh="franka_hand_white_visual_hand" pos="0 0 -0.1034"/>
+      <geom contype="0" conaffinity="0" group="1" type="mesh" rgba="1 0.5 0.12 0.4" mass="0" mesh="franka_hand_white_visual_finger" pos="0 0.02 -0.045"/>
+      <geom contype="0" conaffinity="0" group="1" type="mesh" rgba="1 0.5 0.12 0.4" mass="0" mesh="franka_hand_white_visual_finger" pos="0 -0.02 -0.045" quat="0 0 0 1"/>
+      <geom type="sphere" size="0.009" mass="0" rgba="1 0.5 0.12 1" contype="0" conaffinity="0" group="1"/>
+    </body>
+    <body name="base_link" pos="0 0 0.211467982">
+      <joint name="base_x" type="slide" axis="1 0 0" damping="80" armature="1"/>
+      <joint name="base_y" type="slide" axis="0 1 0" damping="80" armature="1"/>
+      <joint name="base_yaw" type="hinge" axis="0 0 1" damping="40" armature="1"/>
+      <geom class="visual" type="mesh" mesh="tmrv0_2_visual_tmrv0_2" name="base_link_visual_0"/>
+      <geom class="collision" type="mesh" mesh="tmrv0_2_collision_tmrv0_2" name="base_link_collision_1" contype="1" conaffinity="6"/>
+      <body name="caster_front_left_fixed_link" pos="0.3 0.2 0.08">
+        <inertial pos="-0.02365 5e-05 -0.03651" mass="0.3" fullinertia="0.00049538079 0.00070424109 0.00048449394 -4.2663e-07 0.00020926011 -5.0221e-07"/>
+        <body name="caster_front_left_steering_link">
+          <inertial pos="0 0 0" mass="0.2" fullinertia="0.0001 0.0001 0.0001 0 0 0"/>
+          <body name="caster_front_left_link" pos="-0.035 0 -0.05">
+            <inertial pos="0 0 0" mass="0.2" fullinertia="0.0001 0.0001 0.0001 0 0 0"/>
+          </body>
+        </body>
+      </body>
+      <body name="argo_drive_front_fixed_link" pos="0.3 -0.2 0.05">
+        <inertial pos="-0.00019 0.04522 0.02947" mass="7" fullinertia="0.0706049742 0.0343383503 0.0892632596 -0.00025482709 -6.283102e-05 0.00249596715"/>
+        <body name="argo_drive_front_steering_link">
+          <inertial pos="0 0 0" mass="2" fullinertia="0.001 0.001 0.001 0 0 0"/>
+          <body name="argo_drive_front_link">
+            <inertial pos="0 0 0" mass="2.5" fullinertia="0.00189583333 0.00189583333 0.003125 0 0 0"/>
+          </body>
+        </body>
+      </body>
+      <body name="rocker_arm_link" pos="-0.3 0 0.0845">
+        <inertial pos="-0.000344 -0.021232 0.038239" mass="5.183973" fullinertia="0.06708756 0.0231131733 0.0811483296 -7.8335851e-05 4.1831678e-05 0.00714847312"/>
+        <body name="caster_rear_right_fixed_link" pos="0 -0.2 -0.0045">
+          <inertial pos="-0.02365 5e-05 -0.03651" mass="0.3" fullinertia="0.00049538079 0.00070424109 0.00048449394 -4.2663e-07 0.00020926011 -5.0221e-07"/>
+          <body name="caster_rear_right_steering_link">
+            <inertial pos="0 0 0" mass="0.2" fullinertia="0.0001 0.0001 0.0001 0 0 0"/>
+            <body name="caster_rear_right_link" pos="-0.035 0 -0.05">
+              <inertial pos="0 0 0" mass="0.2" fullinertia="0.0001 0.0001 0.0001 0 0 0"/>
+            </body>
+          </body>
+        </body>
+        <body name="argo_drive_rear_fixed_link" pos="0 0.2 -0.0345">
+          <inertial pos="-0.00019 -0.04522 0.02947" mass="7" fullinertia="0.0706049742 0.0343383503 0.0892632596 -0.00025482709 6.283102e-05 -0.00249596715"/>
+          <body name="argo_drive_rear_steering_link">
+            <inertial pos="0 0 0" mass="2" fullinertia="0.001 0.001 0.001 0 0 0"/>
+            <body name="argo_drive_rear_link">
+              <inertial pos="0 0 0" mass="2.5" fullinertia="0.00189583333 0.00189583333 0.003125 0 0 0"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="imu_mounting_point" pos="0.26 0 0.1478" quat="6.123234e-17 1 0 0"/>
+      <body name="front_mounting_point" pos="0.380705 0 0.2345" quat="6.123234e-17 1 0 0"/>
+      <body name="rear_mounting_point" pos="-0.380705 0 0.2345" quat="3.74939946e-33 6.123234e-17 1 6.123234e-17"/>
+      <body name="right_mounting_point" pos="0 -0.272712 0.1145" quat="4.32978028e-17 0.707106781 -0.707106781 -4.32978028e-17"/>
+      <body name="left_mounting_point" pos="0 0.272712 0.1145" quat="4.32978028e-17 0.707106781 0.707106781 4.32978028e-17"/>
+      <body name="lidar_front_mounting_point" pos="0.3275 0.2175 0.19065" quat="2.3432602e-17 -0.923879533 0.382683432 5.65713056e-17"/>
+      <body name="lidar_rear_mounting_point" pos="-0.3275 -0.2175 0.19065" quat="-5.65713056e-17 -0.382683432 -0.923879533 2.3432602e-17"/>
+      <body name="franka_spine" pos="0.138289 0 0.35">
+        <inertial pos="0.042358 0.000378 0.495198" mass="21.909124" fullinertia="3.33896814 3.3245603 0.281489258 -0.000642887 0.299962762 -0.004488422"/>
+        <geom class="visual" type="mesh" mesh="franka_spine_v0_1_visual_franka_spine" name="franka_spine_visual_0"/>
+        <geom class="collision" type="mesh" mesh="franka_spine_v0_1_collision_franka_spine" name="franka_spine_collision_1" contype="1" conaffinity="6"/>
+        <body name="franka_spine_mounting_point" pos="0.266711 0 0.1">
+          <joint name="franka_spine_vertical_joint" axis="0 0 1" type="slide" range="0 0.85" armature="4.0" damping="200"/>
+          <inertial pos="0 0 0" mass="0.01" fullinertia="0.0001 0.0001 0.0001 0 0 0"/>
+          <body name="fr3_duo_mount_mounting_point">
+            <inertial pos="-0.011817 -5e-05 0.044431" mass="4.093846" fullinertia="0.0224318121 0.0164193182 0.0217407036 1.38076e-06 -0.0015719371 -1.442621e-06"/>
+            <geom class="visual" type="mesh" mesh="fr3_duo_mount_v0_3_visual_fr3_duo_mount" name="fr3_duo_mount_mounting_point_visual_0"/>
+            <geom class="visual" type="mesh" mesh="fr3_duo_mount_v0_3_visual_fr3_duo_cover" name="fr3_duo_mount_mounting_point_visual_1" pos="0 0 0.068"/>
+            <geom class="collision" type="mesh" mesh="fr3_duo_mount_v0_3_collision_fr3_duo_mount" name="fr3_duo_mount_mounting_point_collision_2" contype="1" conaffinity="6"/>
+            <geom class="collision" type="mesh" mesh="fr3_duo_mount_v0_3_collision_fr3_duo_cover" name="fr3_duo_mount_mounting_point_collision_3" pos="0 0 0.068" contype="1" conaffinity="6"/>
+            <body name="fr3_duo_mount_origin" pos="0.037 -0 0.05">
+              <body name="fr3_duo_mount_left" pos="0 0.05018 0" quat="0.865806672 -0.436878319 0.0222879149 -0.242939065">
+                <body name="left_base">
+                  <body name="left_fr3v2_1_link0">
+                    <inertial pos="-0.0172 0.0004 0.0745" mass="2.3966" fullinertia="0.009 0.0115 0.0085 0 0.002 0"/>
+                    <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link0" name="left_fr3v2_1_link0_visual_0"/>
+                    <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link0" name="left_fr3v2_1_link0_collision_1" contype="2" conaffinity="5"/>
+                    <body name="left_fr3v2_1_link1" pos="0 0 0.333">
+                      <joint name="left_fr3v2_1_joint1" axis="0 0 1" type="hinge" range="-2.90074002 2.90074002" damping="0.003" frictionloss="0.2" armature="0.605721"/>
+                      <inertial pos="-0.00458 0.027016 -0.0618" mass="2.4377" fullinertia="0.02324 0.02146 0.0055 0.000333 -0.000676 0.003739"/>
+                      <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link1" name="left_fr3v2_1_link1_visual_0"/>
+                      <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link1" name="left_fr3v2_1_link1_collision_1" contype="2" conaffinity="5"/>
+                      <body name="left_fr3v2_1_link2" quat="0.707106781 -0.707106781 0 0">
+                        <joint name="left_fr3v2_1_joint2" axis="0 0 1" type="hinge" range="-1.83609002 1.83609002" damping="0.003" frictionloss="0.2" armature="0.605721"/>
+                        <inertial pos="-0.01063 -0.184739 -0.010479" mass="2.2375" fullinertia="0.019026 0.00566 0.017114 0.001241 0.000499 -0.001804"/>
+                        <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link2" name="left_fr3v2_1_link2_visual_0"/>
+                        <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link2" name="left_fr3v2_1_link2_collision_1" contype="2" conaffinity="5"/>
+                        <body name="left_fr3v2_1_link3" pos="0 -0.316 0" quat="0.707106781 0.707106781 0 0">
+                          <joint name="left_fr3v2_1_joint3" axis="0 0 1" type="hinge" range="-2.90074002 2.90074002" damping="0.003" frictionloss="0.2" armature="0.462474"/>
+                          <inertial pos="0.091995 0.023003 0.047348" mass="2.196382" fullinertia="0.010225 0.012398 0.006877 0.001144 0.003497 0.002156"/>
+                          <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link3" name="left_fr3v2_1_link3_visual_0"/>
+                          <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link3" name="left_fr3v2_1_link3_collision_1" contype="2" conaffinity="5"/>
+                          <body name="left_fr3v2_1_link4" pos="0.0825 0 0" quat="0.707106781 0.707106781 0 0">
+                            <joint name="left_fr3v2_1_joint4" axis="0 0 1" type="hinge" range="-3.07702002 -0.116937083" damping="0.003" frictionloss="0.2" armature="0.462474"/>
+                            <inertial pos="-0.084334 0.096836 0.006248" mass="2.186422" fullinertia="0.008878 0.007628 0.010295 -0.003749 0.001139 -0.00046"/>
+                            <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link4" name="left_fr3v2_1_link4_visual_0"/>
+                            <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link4" name="left_fr3v2_1_link4_collision_1" contype="2" conaffinity="5"/>
+                            <body name="left_fr3v2_1_link5" pos="-0.0825 0.384 0" quat="0.707106781 -0.707106781 0 0">
+                              <joint name="left_fr3v2_1_joint5" axis="0 0 1" type="hinge" range="-2.87630335 2.87630335" damping="0.003" frictionloss="0.2" armature="0.205544"/>
+                              <inertial pos="3.9e-05 0.011821 -0.054936" mass="2.190783" fullinertia="0.031874 0.029674 0.004751 0.000134 -0.000265 -0.004734"/>
+                              <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link5" name="left_fr3v2_1_link5_visual_0"/>
+                              <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link5" name="left_fr3v2_1_link5_collision_1" contype="2" conaffinity="5"/>
+                              <body name="left_fr3v2_1_link6" quat="0.707106781 0.707106781 0 0">
+                                <joint name="left_fr3v2_1_joint6" axis="0 0 1" type="hinge" range="0.43982265 4.62163335" damping="0.003" frictionloss="0.2" armature="0.205544"/>
+                                <inertial pos="0.069627 -0.016716 -0.037235" mass="1.583583" fullinertia="0.00286 0.00391 0.00453 -0.000553 -0.000638 -0.00024"/>
+                                <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link6" name="left_fr3v2_1_link6_visual_0"/>
+                                <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link6" name="left_fr3v2_1_link6_collision_1" contype="2" conaffinity="5"/>
+                                <body name="left_fr3v2_1_link7" pos="0.088 0 0" quat="0.707106781 0.707106781 0 0">
+                                  <joint name="left_fr3v2_1_joint7" axis="0 0 1" type="hinge" range="-3.05083335 3.05083335" damping="0.003" frictionloss="0.2" armature="0.205544"/>
+                                  <inertial pos="-0.014555 0.00923 0.065858" mass="0.698686" fullinertia="0.000899 0.001099 0.000702 0 -1.3e-05 -2.2e-05"/>
+                                  <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link7" name="left_fr3v2_1_link7_visual_0"/>
+                                  <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link7" name="left_fr3v2_1_link7_collision_1" contype="2" conaffinity="5"/>
+                                  <body name="left_fr3v2_1_link8" pos="0 0 0.107">
+                                    <body name="left_fr3v2_1_hand" quat="0.923879533 0 0 -0.382683432">
+                                      <inertial pos="-3.76e-05 0.0119128 0.020726" mass="0.6544" fullinertia="0.00186 0.0003 0.00174 0 0 -2e-05"/>
+                                      <geom class="visual" type="mesh" mesh="franka_hand_white_visual_hand" name="left_fr3v2_1_hand_visual_0"/>
+                                      <geom class="collision" type="mesh" mesh="franka_hand_white_collision_hand" name="left_fr3v2_1_hand_collision_1" contype="2" conaffinity="5"/>
+                                      <body name="left_fr3v2_1_hand_tcp" pos="0 0 0.1034">
+                                        <site name="left_fr3v2_1_hand_tcp" size="0.005" rgba="1 0 0 1" group="4"/>
+                                      </body>
+                                      <body name="left_fr3v2_1_leftfinger" pos="0 0 0.0584">
+                                        <joint name="left_fr3v2_1_finger_joint1" axis="0 1 0" type="slide" range="0 0.04" damping="0.3"/>
+                                        <inertial pos="0 0.015285 0.0219675" mass="0.0291" fullinertia="8.49e-06 8.53e-06 1.77e-06 0 0 -1.06e-06"/>
+                                        <geom class="visual" type="mesh" mesh="franka_hand_white_visual_finger" name="left_fr3v2_1_leftfinger_visual_0"/>
+                                        <!-- The fingers shipped visual-only, so nothing could be grasped. Boxes fitted to
+                                             franka_hand_white_visual_finger (x +-0.0105, y 0..0.0263, z 0..0.0539); the
+                                             gripping face is the y = 0 plane, so closed fingers meet exactly at zero. -->
+                                        <geom class="collision" type="box" size="0.0105 0.0132 0.0145" pos="0 0.0132 0.0145" name="left_fr3v2_1_leftfinger_collision_1" contype="2" conaffinity="5"/>
+                                        <geom class="collision" type="box" size="0.009 0.0068 0.012" pos="0 0.0068 0.042" name="left_fr3v2_1_leftfinger_pad_collision_2" contype="2" conaffinity="5" friction="1.5 0.02 0.002"/>
+                                      </body>
+                                      <body name="left_fr3v2_1_rightfinger" pos="0 0 0.0584" quat="6.123234e-17 0 0 1">
+                                        <joint name="left_fr3v2_1_finger_joint2" axis="0 1 0" type="slide" range="0 0.04" damping="0.3"/>
+                                        <inertial pos="0 0.015285 0.0219675" mass="0.0291" fullinertia="8.49e-06 8.53e-06 1.77e-06 0 0 -1.06e-06"/>
+                                        <geom class="visual" type="mesh" mesh="franka_hand_white_visual_finger" name="left_fr3v2_1_rightfinger_visual_0"/>
+                                        <!-- The fingers shipped visual-only, so nothing could be grasped. Boxes fitted to
+                                             franka_hand_white_visual_finger (x +-0.0105, y 0..0.0263, z 0..0.0539); the
+                                             gripping face is the y = 0 plane, so closed fingers meet exactly at zero. -->
+                                        <geom class="collision" type="box" size="0.0105 0.0132 0.0145" pos="0 0.0132 0.0145" name="left_fr3v2_1_rightfinger_collision_1" contype="2" conaffinity="5"/>
+                                        <geom class="collision" type="box" size="0.009 0.0068 0.012" pos="0 0.0068 0.042" name="left_fr3v2_1_rightfinger_pad_collision_2" contype="2" conaffinity="5" friction="1.5 0.02 0.002"/>
+                                      </body>
+                                    </body>
+                                  </body>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+              <body name="fr3_duo_mount_right" pos="0 -0.05018 0" quat="0.865806672 0.436878319 0.0222879149 0.242939065">
+                <body name="right_base">
+                  <body name="right_fr3v2_1_link0">
+                    <inertial pos="-0.0172 0.0004 0.0745" mass="2.3966" fullinertia="0.009 0.0115 0.0085 0 0.002 0"/>
+                    <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link0" name="right_fr3v2_1_link0_visual_0"/>
+                    <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link0" name="right_fr3v2_1_link0_collision_1" contype="4" conaffinity="3"/>
+                    <body name="right_fr3v2_1_link1" pos="0 0 0.333">
+                      <joint name="right_fr3v2_1_joint1" axis="0 0 1" type="hinge" range="-2.90074002 2.90074002" damping="0.003" frictionloss="0.2" armature="0.605721"/>
+                      <inertial pos="-0.00458 0.027016 -0.0618" mass="2.4377" fullinertia="0.02324 0.02146 0.0055 0.000333 -0.000676 0.003739"/>
+                      <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link1" name="right_fr3v2_1_link1_visual_0"/>
+                      <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link1" name="right_fr3v2_1_link1_collision_1" contype="4" conaffinity="3"/>
+                      <body name="right_fr3v2_1_link2" quat="0.707106781 -0.707106781 0 0">
+                        <joint name="right_fr3v2_1_joint2" axis="0 0 1" type="hinge" range="-1.83609002 1.83609002" damping="0.003" frictionloss="0.2" armature="0.605721"/>
+                        <inertial pos="-0.01063 -0.184739 -0.010479" mass="2.2375" fullinertia="0.019026 0.00566 0.017114 0.001241 0.000499 -0.001804"/>
+                        <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link2" name="right_fr3v2_1_link2_visual_0"/>
+                        <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link2" name="right_fr3v2_1_link2_collision_1" contype="4" conaffinity="3"/>
+                        <body name="right_fr3v2_1_link3" pos="0 -0.316 0" quat="0.707106781 0.707106781 0 0">
+                          <joint name="right_fr3v2_1_joint3" axis="0 0 1" type="hinge" range="-2.90074002 2.90074002" damping="0.003" frictionloss="0.2" armature="0.462474"/>
+                          <inertial pos="0.091995 0.023003 0.047348" mass="2.196382" fullinertia="0.010225 0.012398 0.006877 0.001144 0.003497 0.002156"/>
+                          <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link3" name="right_fr3v2_1_link3_visual_0"/>
+                          <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link3" name="right_fr3v2_1_link3_collision_1" contype="4" conaffinity="3"/>
+                          <body name="right_fr3v2_1_link4" pos="0.0825 0 0" quat="0.707106781 0.707106781 0 0">
+                            <joint name="right_fr3v2_1_joint4" axis="0 0 1" type="hinge" range="-3.07702002 -0.116937083" damping="0.003" frictionloss="0.2" armature="0.462474"/>
+                            <inertial pos="-0.084334 0.096836 0.006248" mass="2.186422" fullinertia="0.008878 0.007628 0.010295 -0.003749 0.001139 -0.00046"/>
+                            <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link4" name="right_fr3v2_1_link4_visual_0"/>
+                            <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link4" name="right_fr3v2_1_link4_collision_1" contype="4" conaffinity="3"/>
+                            <body name="right_fr3v2_1_link5" pos="-0.0825 0.384 0" quat="0.707106781 -0.707106781 0 0">
+                              <joint name="right_fr3v2_1_joint5" axis="0 0 1" type="hinge" range="-2.87630335 2.87630335" damping="0.003" frictionloss="0.2" armature="0.205544"/>
+                              <inertial pos="3.9e-05 0.011821 -0.054936" mass="2.190783" fullinertia="0.031874 0.029674 0.004751 0.000134 -0.000265 -0.004734"/>
+                              <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link5" name="right_fr3v2_1_link5_visual_0"/>
+                              <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link5" name="right_fr3v2_1_link5_collision_1" contype="4" conaffinity="3"/>
+                              <body name="right_fr3v2_1_link6" quat="0.707106781 0.707106781 0 0">
+                                <joint name="right_fr3v2_1_joint6" axis="0 0 1" type="hinge" range="0.43982265 4.62163335" damping="0.003" frictionloss="0.2" armature="0.205544"/>
+                                <inertial pos="0.069627 -0.016716 -0.037235" mass="1.583583" fullinertia="0.00286 0.00391 0.00453 -0.000553 -0.000638 -0.00024"/>
+                                <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link6" name="right_fr3v2_1_link6_visual_0"/>
+                                <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link6" name="right_fr3v2_1_link6_collision_1" contype="4" conaffinity="3"/>
+                                <body name="right_fr3v2_1_link7" pos="0.088 0 0" quat="0.707106781 0.707106781 0 0">
+                                  <joint name="right_fr3v2_1_joint7" axis="0 0 1" type="hinge" range="-3.05083335 3.05083335" damping="0.003" frictionloss="0.2" armature="0.205544"/>
+                                  <inertial pos="-0.014555 0.00923 0.065858" mass="0.698686" fullinertia="0.000899 0.001099 0.000702 0 -1.3e-05 -2.2e-05"/>
+                                  <geom class="visual" type="mesh" mesh="fr3v2_1_visual_link7" name="right_fr3v2_1_link7_visual_0"/>
+                                  <geom class="collision" type="mesh" mesh="fr3v2_1_collision_link7" name="right_fr3v2_1_link7_collision_1" contype="4" conaffinity="3"/>
+                                  <body name="right_fr3v2_1_link8" pos="0 0 0.107">
+                                    <body name="right_fr3v2_1_hand" quat="0.923879533 0 0 -0.382683432">
+                                      <inertial pos="-3.76e-05 0.0119128 0.020726" mass="0.6544" fullinertia="0.00186 0.0003 0.00174 0 0 -2e-05"/>
+                                      <geom class="visual" type="mesh" mesh="franka_hand_white_visual_hand" name="right_fr3v2_1_hand_visual_0"/>
+                                      <geom class="collision" type="mesh" mesh="franka_hand_white_collision_hand" name="right_fr3v2_1_hand_collision_1" contype="4" conaffinity="3"/>
+                                      <body name="right_fr3v2_1_hand_tcp" pos="0 0 0.1034">
+                                        <site name="right_fr3v2_1_hand_tcp" size="0.005" rgba="1 0 0 1" group="4"/>
+                                      </body>
+                                      <body name="right_fr3v2_1_leftfinger" pos="0 0 0.0584">
+                                        <joint name="right_fr3v2_1_finger_joint1" axis="0 1 0" type="slide" range="0 0.04" damping="0.3"/>
+                                        <inertial pos="0 0.015285 0.0219675" mass="0.0291" fullinertia="8.49e-06 8.53e-06 1.77e-06 0 0 -1.06e-06"/>
+                                        <geom class="visual" type="mesh" mesh="franka_hand_white_visual_finger" name="right_fr3v2_1_leftfinger_visual_0"/>
+                                        <!-- The fingers shipped visual-only, so nothing could be grasped. Boxes fitted to
+                                             franka_hand_white_visual_finger (x +-0.0105, y 0..0.0263, z 0..0.0539); the
+                                             gripping face is the y = 0 plane, so closed fingers meet exactly at zero. -->
+                                        <geom class="collision" type="box" size="0.0105 0.0132 0.0145" pos="0 0.0132 0.0145" name="right_fr3v2_1_leftfinger_collision_1" contype="4" conaffinity="3"/>
+                                        <geom class="collision" type="box" size="0.009 0.0068 0.012" pos="0 0.0068 0.042" name="right_fr3v2_1_leftfinger_pad_collision_2" contype="4" conaffinity="3" friction="1.5 0.02 0.002"/>
+                                      </body>
+                                      <body name="right_fr3v2_1_rightfinger" pos="0 0 0.0584" quat="6.123234e-17 0 0 1">
+                                        <joint name="right_fr3v2_1_finger_joint2" axis="0 1 0" type="slide" range="0 0.04" damping="0.3"/>
+                                        <inertial pos="0 0.015285 0.0219675" mass="0.0291" fullinertia="8.49e-06 8.53e-06 1.77e-06 0 0 -1.06e-06"/>
+                                        <geom class="visual" type="mesh" mesh="franka_hand_white_visual_finger" name="right_fr3v2_1_rightfinger_visual_0"/>
+                                        <!-- The fingers shipped visual-only, so nothing could be grasped. Boxes fitted to
+                                             franka_hand_white_visual_finger (x +-0.0105, y 0..0.0263, z 0..0.0539); the
+                                             gripping face is the y = 0 plane, so closed fingers meet exactly at zero. -->
+                                        <geom class="collision" type="box" size="0.0105 0.0132 0.0145" pos="0 0.0132 0.0145" name="right_fr3v2_1_rightfinger_collision_1" contype="4" conaffinity="3"/>
+                                        <geom class="collision" type="box" size="0.009 0.0068 0.012" pos="0 0.0068 0.042" name="right_fr3v2_1_rightfinger_pad_collision_2" contype="4" conaffinity="3" friction="1.5 0.02 0.002"/>
+                                      </body>
+                                    </body>
+                                  </body>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+            <body name="head_link" pos="0 0 0.167">
+              <inertial pos="0 0 0" mass="0.350865" fullinertia="0.003020352 0.003067069 0.000160526 -2.194e-05 0.00016159 -5.8102e-05"/>
+              <geom class="visual" type="mesh" mesh="franka_head_v0_2_visual_franka_head" name="head_link_visual_0"/>
+              <geom class="collision" type="mesh" mesh="franka_head_v0_2_collision_franka_head" name="head_link_collision_1" contype="1" conaffinity="6"/>
+              <body name="head_camera_mounting_point" pos="0.0424637889 -0.014113 0.223525901" quat="0.936669561 0 0.350214409 0">
+                <inertial pos="0 0 0" mass="0.001" fullinertia="1e-07 1e-07 1e-07 0 0 0"/>
+                <camera mode="fixed" resolution="1280 720" focal="0.0028 0.0028" sensorsize="0.00512 0.00288" principal="0 0" name="zed_left" pos="0 -0 0" xyaxes="0 -1 0 -0 -0 1"/>
+                <camera mode="fixed" resolution="1280 720" focal="0.0028 0.0028" sensorsize="0.00512 0.00288" principal="0 0" name="zed_right" pos="0 -0.063 0" xyaxes="0 -1 0 -0 -0 1"/>
+                <site name="zed_left_optical" size="0.004" rgba="0 1 0 1" group="4" xyaxes="0 -1 0 0 0 -1"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <inertial pos="0.006619 -0.00221 0.184355" mass="88.954183" fullinertia="3.24552427 4.16237064 5.84147335 0.0070603144 -0.13460422 -0.0107705476"/>
+    </body>
+    <!-- Datacenter rack, 600 x 1000 x 2000 mm, open front, front face at world
+         x = 1.15. Bay geometry is set by the Franka hand, not by 19" convention: open
+         at 60 mm the gripper is 87 mm across the pads and 113 mm across the finger bases,
+         so a real 26 mm 2.5" bay array is unreachable. Here the bays are on a 70 mm
+         pitch and each sled carries a pull-bar standing 56 mm proud of the bay mouth, so
+         the pads close on the bar in free air and the finger bases never enter the bay.
+         Grasp point (pull-bar centre) is world x = 1.165.
+         contype 1 / conaffinity 7: the rack and the sleds collide with the torso and base (1),
+         the left arm (2) and the right arm (4). Rack-vs-rack pairs cost nothing, since every
+         rack geom is welded to the world and MuJoCo filters them. -->
+    <body name="datacenter_rack" pos="1.65 0 0">
+      <!-- enclosure: 600 x 1000 x 2000 mm, open front -->
+      <geom class="rack" name="rack_plinth" size="0.5 0.3 0.025" pos="0 0 0.025" material="rack_panel"/>
+      <geom class="rack" name="rack_top" size="0.5 0.3 0.01" pos="0 0 1.99" material="rack_panel"/>
+      <geom class="rack" name="rack_side_left" size="0.5 0.008 0.965" pos="0 0.292 1.015" material="rack_panel"/>
+      <geom class="rack" name="rack_side_right" size="0.5 0.008 0.965" pos="0 -0.292 1.015" material="rack_panel"/>
+      <geom class="rack" name="rack_back" size="0.008 0.284 0.965" pos="0.492 0 1.015" material="rack_panel"/>
+      <!-- 19" EIA mounting rails and front corner posts -->
+      <geom class="rack" name="rack_rail_front_left" size="0.012 0.015 0.965" pos="-0.47 0.24 1.015" material="rack_rail"/>
+      <geom class="rack" name="rack_rail_rear_left" size="0.012 0.015 0.965" pos="0.42 0.24 1.015" material="rack_rail"/>
+      <geom class="rack" name="rack_post_left" size="0.012 0.012 0.965" pos="-0.488 0.288 1.015" material="rack_frame"/>
+      <geom class="rack" name="rack_rail_front_right" size="0.012 0.015 0.965" pos="-0.47 -0.24 1.015" material="rack_rail"/>
+      <geom class="rack" name="rack_rail_rear_right" size="0.012 0.015 0.965" pos="0.42 -0.24 1.015" material="rack_rail"/>
+      <geom class="rack" name="rack_post_right" size="0.012 0.012 0.965" pos="-0.488 -0.288 1.015" material="rack_frame"/>
+      <!-- mounted equipment -->
+      <geom class="rack" name="rack_gpu_node_a" size="0.39 0.225 0.0889" pos="-0.05 0 0.1489" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_bezel" size="0.004 0.225 0.0889" pos="-0.444 0 0.1489" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 0.2278" material="led_green"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 0.2278" material="led_blue"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_vent0" size="0.0005 0.016 0.0809" pos="-0.4485 -0.13 0.1489" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_vent1" size="0.0005 0.016 0.0809" pos="-0.4485 -0.085 0.1489" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_vent2" size="0.0005 0.016 0.0809" pos="-0.4485 -0.04 0.1489" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_vent3" size="0.0005 0.016 0.0809" pos="-0.4485 0.005 0.1489" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_vent4" size="0.0005 0.016 0.0809" pos="-0.4485 0.05 0.1489" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_a_vent5" size="0.0005 0.016 0.0809" pos="-0.4485 0.095 0.1489" material="server_vent"/>
+      <geom class="rack" name="rack_compute_a" size="0.36 0.225 0.04445" pos="-0.08 0 0.29445" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_a_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 0.29445" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_a_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 0.3289" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_a_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 0.3289" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_a_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 0.29445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_a_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 0.29445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_a_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 0.29445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_a_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 0.29445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_a_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 0.29445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_a_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 0.29445" material="server_vent"/>
+      <geom class="rack" name="rack_compute_b" size="0.36 0.225 0.04445" pos="-0.08 0 0.38945" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_b_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 0.38945" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_b_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 0.4239" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_b_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 0.4239" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_b_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 0.38945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_b_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 0.38945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_b_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 0.38945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_b_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 0.38945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_b_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 0.38945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_b_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 0.38945" material="server_vent"/>
+      <geom class="rack" name="rack_blank_a" size="0.015 0.225 0.022225" pos="-0.425 0 0.462225" material="blank_panel"/>
+      <geom class="rack" name="rack_compute_c" size="0.36 0.225 0.04445" pos="-0.08 0 0.53445" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_c_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 0.53445" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_c_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 0.5689" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_c_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 0.5689" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_c_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 0.53445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_c_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 0.53445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_c_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 0.53445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_c_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 0.53445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_c_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 0.53445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_c_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 0.53445" material="server_vent"/>
+      <geom class="rack" name="rack_tor_switch_a" size="0.175 0.225 0.022225" pos="-0.265 0 0.607225" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_bezel" size="0.004 0.225 0.022225" pos="-0.444 0 0.607225" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led0" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.18 0.613225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led1" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.147 0.613225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led2" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.114 0.613225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led3" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.081 0.613225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led4" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.048 0.613225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led5" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.015 0.613225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led6" size="0.0005 0.0035 0.0025" pos="-0.4485 0.018 0.613225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led7" size="0.0005 0.0035 0.0025" pos="-0.4485 0.051 0.613225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led8" size="0.0005 0.0035 0.0025" pos="-0.4485 0.084 0.613225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led9" size="0.0005 0.0035 0.0025" pos="-0.4485 0.117 0.613225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led10" size="0.0005 0.0035 0.0025" pos="-0.4485 0.15 0.613225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_a_led11" size="0.0005 0.0035 0.0025" pos="-0.4485 0.183 0.613225" material="led_green"/>
+      <geom class="rack" name="rack_blank_b" size="0.015 0.225 0.022225" pos="-0.425 0 0.657225" material="blank_panel"/>
+      <geom class="rack" name="rack_blank_c" size="0.015 0.225 0.022225" pos="-0.425 0 0.852225" material="blank_panel"/>
+      <geom class="rack" name="rack_compute_d" size="0.36 0.225 0.04445" pos="-0.08 0 1.15445" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_d_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 1.15445" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_d_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 1.1889" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_d_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 1.1889" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_d_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 1.15445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_d_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 1.15445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_d_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 1.15445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_d_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 1.15445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_d_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 1.15445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_d_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 1.15445" material="server_vent"/>
+      <geom class="rack" name="rack_compute_e" size="0.36 0.225 0.04445" pos="-0.08 0 1.24945" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_e_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 1.24945" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_e_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 1.2839" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_e_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 1.2839" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_e_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 1.24945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_e_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 1.24945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_e_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 1.24945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_e_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 1.24945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_e_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 1.24945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_e_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 1.24945" material="server_vent"/>
+      <geom class="rack" name="rack_tor_switch_b" size="0.175 0.225 0.022225" pos="-0.265 0 1.322225" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_bezel" size="0.004 0.225 0.022225" pos="-0.444 0 1.322225" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led0" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.18 1.328225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led1" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.147 1.328225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led2" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.114 1.328225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led3" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.081 1.328225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led4" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.048 1.328225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led5" size="0.0005 0.0035 0.0025" pos="-0.4485 -0.015 1.328225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led6" size="0.0005 0.0035 0.0025" pos="-0.4485 0.018 1.328225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led7" size="0.0005 0.0035 0.0025" pos="-0.4485 0.051 1.328225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led8" size="0.0005 0.0035 0.0025" pos="-0.4485 0.084 1.328225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led9" size="0.0005 0.0035 0.0025" pos="-0.4485 0.117 1.328225" material="led_amber"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led10" size="0.0005 0.0035 0.0025" pos="-0.4485 0.15 1.328225" material="led_green"/>
+      <geom class="rack_deco" name="rack_tor_switch_b_led11" size="0.0005 0.0035 0.0025" pos="-0.4485 0.183 1.328225" material="led_green"/>
+      <geom class="rack" name="rack_gpu_node_b" size="0.39 0.225 0.0889" pos="-0.05 0 1.4389" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_bezel" size="0.004 0.225 0.0889" pos="-0.444 0 1.4389" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 1.5178" material="led_green"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 1.5178" material="led_blue"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_vent0" size="0.0005 0.016 0.0809" pos="-0.4485 -0.13 1.4389" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_vent1" size="0.0005 0.016 0.0809" pos="-0.4485 -0.085 1.4389" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_vent2" size="0.0005 0.016 0.0809" pos="-0.4485 -0.04 1.4389" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_vent3" size="0.0005 0.016 0.0809" pos="-0.4485 0.005 1.4389" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_vent4" size="0.0005 0.016 0.0809" pos="-0.4485 0.05 1.4389" material="server_vent"/>
+      <geom class="rack_deco" name="rack_gpu_node_b_vent5" size="0.0005 0.016 0.0809" pos="-0.4485 0.095 1.4389" material="server_vent"/>
+      <geom class="rack" name="rack_compute_f" size="0.36 0.225 0.04445" pos="-0.08 0 1.57945" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_f_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 1.57945" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_f_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 1.6139" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_f_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 1.6139" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_f_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 1.57945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_f_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 1.57945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_f_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 1.57945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_f_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 1.57945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_f_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 1.57945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_f_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 1.57945" material="server_vent"/>
+      <geom class="rack" name="rack_blank_d" size="0.015 0.225 0.022225" pos="-0.425 0 1.652225" material="blank_panel"/>
+      <geom class="rack" name="rack_compute_g" size="0.36 0.225 0.04445" pos="-0.08 0 1.72445" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_g_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 1.72445" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_g_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 1.7589" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_g_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 1.7589" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_g_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 1.72445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_g_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 1.72445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_g_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 1.72445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_g_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 1.72445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_g_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 1.72445" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_g_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 1.72445" material="server_vent"/>
+      <geom class="rack" name="rack_compute_h" size="0.36 0.225 0.04445" pos="-0.08 0 1.81945" material="server_chassis"/>
+      <geom class="rack_deco" name="rack_compute_h_bezel" size="0.004 0.225 0.04445" pos="-0.444 0 1.81945" material="server_bezel"/>
+      <geom class="rack_deco" name="rack_compute_h_led0" size="0.0005 0.004 0.004" pos="-0.4485 -0.205 1.8539" material="led_green"/>
+      <geom class="rack_deco" name="rack_compute_h_led1" size="0.0005 0.004 0.004" pos="-0.4485 -0.19 1.8539" material="led_blue"/>
+      <geom class="rack_deco" name="rack_compute_h_vent0" size="0.0005 0.016 0.03645" pos="-0.4485 -0.13 1.81945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_h_vent1" size="0.0005 0.016 0.03645" pos="-0.4485 -0.085 1.81945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_h_vent2" size="0.0005 0.016 0.03645" pos="-0.4485 -0.04 1.81945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_h_vent3" size="0.0005 0.016 0.03645" pos="-0.4485 0.005 1.81945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_h_vent4" size="0.0005 0.016 0.03645" pos="-0.4485 0.05 1.81945" material="server_vent"/>
+      <geom class="rack_deco" name="rack_compute_h_vent5" size="0.0005 0.016 0.03645" pos="-0.4485 0.095 1.81945" material="server_vent"/>
+      <!-- 5U robot-serviceable SSD shelf: 2 x 6 bays, the swap target -->
+      <geom class="rack" name="rack_ssd_shelf_body" size="0.22 0.225 0.111125" pos="-0.06 0 0.986125" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_deck_0" size="0.08 0.225 0.0065" pos="-0.36 0 0.8815" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_deck_1" size="0.08 0.225 0.004" pos="-0.36 0 0.984" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_deck_top" size="0.08 0.225 0.008625" pos="-0.36 0 1.088625" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_end_0_left" size="0.08 0.0055 0.046" pos="-0.36 0.2195 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_end_0_right" size="0.08 0.0055 0.046" pos="-0.36 -0.2195 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_stop_0" size="0.004 0.214 0.046" pos="-0.328 0 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_0_0" size="0.053 0.004 0.046" pos="-0.385 -0.21 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_0_1" size="0.053 0.004 0.046" pos="-0.385 -0.14 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_0_2" size="0.053 0.004 0.046" pos="-0.385 -0.07 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_0_3" size="0.053 0.004 0.046" pos="-0.385 0 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_0_4" size="0.053 0.004 0.046" pos="-0.385 0.07 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_0_5" size="0.053 0.004 0.046" pos="-0.385 0.14 0.934" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_0_6" size="0.053 0.004 0.046" pos="-0.385 0.21 0.934" material="shelf_body"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_0_0" size="0.0025 0.006 0.003" pos="-0.4445 -0.175 0.972" material="led_green"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_0_1" size="0.0025 0.006 0.003" pos="-0.4445 -0.105 0.972" material="led_green"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_0_2" size="0.0025 0.006 0.003" pos="-0.4445 -0.035 0.972" material="led_off"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_0_3" size="0.0025 0.006 0.003" pos="-0.4445 0.035 0.972" material="led_green"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_0_4" size="0.0025 0.006 0.003" pos="-0.4445 0.105 0.972" material="led_green"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_0_5" size="0.0025 0.006 0.003" pos="-0.4445 0.175 0.972" material="led_green"/>
+      <geom class="rack" name="rack_ssd_end_1_left" size="0.08 0.0055 0.046" pos="-0.36 0.2195 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_end_1_right" size="0.08 0.0055 0.046" pos="-0.36 -0.2195 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_stop_1" size="0.004 0.214 0.046" pos="-0.328 0 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_1_0" size="0.053 0.004 0.046" pos="-0.385 -0.21 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_1_1" size="0.053 0.004 0.046" pos="-0.385 -0.14 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_1_2" size="0.053 0.004 0.046" pos="-0.385 -0.07 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_1_3" size="0.053 0.004 0.046" pos="-0.385 0 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_1_4" size="0.053 0.004 0.046" pos="-0.385 0.07 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_1_5" size="0.053 0.004 0.046" pos="-0.385 0.14 1.034" material="shelf_body"/>
+      <geom class="rack" name="rack_ssd_divider_1_6" size="0.053 0.004 0.046" pos="-0.385 0.21 1.034" material="shelf_body"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_1_0" size="0.0025 0.006 0.003" pos="-0.4445 -0.175 1.072" material="led_green"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_1_1" size="0.0025 0.006 0.003" pos="-0.4445 -0.105 1.072" material="led_off"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_1_2" size="0.0025 0.006 0.003" pos="-0.4445 -0.035 1.072" material="led_green"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_1_3" size="0.0025 0.006 0.003" pos="-0.4445 0.035 1.072" material="led_green"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_1_4" size="0.0025 0.006 0.003" pos="-0.4445 0.105 1.072" material="led_off"/>
+      <geom class="rack_deco" name="rack_ssd_bay_led_1_5" size="0.0025 0.006 0.003" pos="-0.4445 0.175 1.072" material="led_green"/>
+      <!-- 2U open spares tray: pull straight out or lift straight up -->
+      <geom class="rack" name="rack_tray_deck" size="0.15 0.225 0.015" pos="-0.29 0 0.715" material="shelf_body"/>
+      <geom class="rack" name="rack_tray_stop" size="0.004 0.109 0.022" pos="-0.328 0 0.752" material="shelf_body"/>
+      <geom class="rack" name="rack_tray_divider_0" size="0.053 0.004 0.022" pos="-0.385 -0.105 0.752" material="shelf_body"/>
+      <geom class="rack" name="rack_tray_divider_1" size="0.053 0.004 0.022" pos="-0.385 -0.035 0.752" material="shelf_body"/>
+      <geom class="rack" name="rack_tray_divider_2" size="0.053 0.004 0.022" pos="-0.385 0.035 0.752" material="shelf_body"/>
+      <geom class="rack" name="rack_tray_divider_3" size="0.053 0.004 0.022" pos="-0.385 0.105 0.752" material="shelf_body"/>
+      <geom class="rack_deco" name="rack_tray_label" size="0.0025 0.045 0.011" pos="-0.4445 0.165 0.76" material="ssd_label"/>
+    </body>
+    <body name="ssd_r0b0" pos="1.262 -0.175 0.9265">
+      <freejoint name="ssd_r0b0_free"/>
+      <geom class="ssd" name="ssd_r0b0_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r0b0_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r0b0_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r0b0_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r0b0_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r0b1" pos="1.262 -0.105 0.9265">
+      <freejoint name="ssd_r0b1_free"/>
+      <geom class="ssd" name="ssd_r0b1_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r0b1_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r0b1_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r0b1_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r0b1_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r0b3" pos="1.262 0.035 0.9265">
+      <freejoint name="ssd_r0b3_free"/>
+      <geom class="ssd" name="ssd_r0b3_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r0b3_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r0b3_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r0b3_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r0b3_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r0b4" pos="1.262 0.105 0.9265">
+      <freejoint name="ssd_r0b4_free"/>
+      <geom class="ssd" name="ssd_r0b4_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r0b4_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r0b4_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r0b4_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r0b4_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r0b5" pos="1.262 0.175 0.9265">
+      <freejoint name="ssd_r0b5_free"/>
+      <geom class="ssd" name="ssd_r0b5_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r0b5_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r0b5_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r0b5_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r0b5_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r1b0" pos="1.262 -0.175 1.0265">
+      <freejoint name="ssd_r1b0_free"/>
+      <geom class="ssd" name="ssd_r1b0_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r1b0_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r1b0_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r1b0_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r1b0_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r1b2" pos="1.262 -0.035 1.0265">
+      <freejoint name="ssd_r1b2_free"/>
+      <geom class="ssd" name="ssd_r1b2_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r1b2_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r1b2_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r1b2_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r1b2_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r1b3" pos="1.262 0.035 1.0265">
+      <freejoint name="ssd_r1b3_free"/>
+      <geom class="ssd" name="ssd_r1b3_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r1b3_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r1b3_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r1b3_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r1b3_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_r1b5" pos="1.262 0.175 1.0265">
+      <freejoint name="ssd_r1b5_free"/>
+      <geom class="ssd" name="ssd_r1b5_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_r1b5_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_r1b5_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_r1b5_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_r1b5_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_green"/>
+    </body>
+    <body name="ssd_spare_0" pos="1.262 -0.07 0.7685">
+      <freejoint name="ssd_spare_0_free"/>
+      <geom class="ssd" name="ssd_spare_0_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_spare_0_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_spare_0_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_spare_0_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_spare_0_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_off"/>
+    </body>
+    <body name="ssd_spare_2" pos="1.262 0.07 0.7685">
+      <freejoint name="ssd_spare_2_free"/>
+      <geom class="ssd" name="ssd_spare_2_carrier" size="0.05 0.027 0.038" mass="0.16"/>
+      <geom class="ssd" name="ssd_spare_2_stem" size="0.019 0.008 0.01" pos="-0.069 0 0" material="ssd_handle" mass="0.01"/>
+      <geom class="ssd" name="ssd_spare_2_bar" size="0.009 0.012 0.032" pos="-0.097 0 0" material="ssd_handle" mass="0.03"/>
+      <geom class="ssd_deco" name="ssd_spare_2_label" size="0.035 0.02 0.0004" pos="0.005 0 0.038" material="ssd_label"/>
+      <geom class="ssd_deco" name="ssd_spare_2_led" size="0.0006 0.004 0.004" pos="-0.1066 0 0.024" material="led_off"/>
+    </body>
+  </worldbody>
+  <!-- Finger kp is 3000, not the 400 the arm shipped with: a position servo at 400
+       develops only 400*0.012 = 4.8 N against a 24 mm object, an order of magnitude
+       under the Franka Hand's 20-70 N grasping force and far too little moment to
+       hold a sled on the end of a pull-bar. 3000 puts a full squeeze at 36 N. -->
+  <actuator>
+    <velocity name="base_x" joint="base_x" kv="4000" ctrlrange="-1.75 1.75" forcerange="-3000 3000"/>
+    <velocity name="base_y" joint="base_y" kv="4000" ctrlrange="-1.75 1.75" forcerange="-3000 3000"/>
+    <velocity name="base_yaw" joint="base_yaw" kv="2000" ctrlrange="-2 2" forcerange="-3000 3000"/>
+    <position name="franka_spine_vertical_joint" joint="franka_spine_vertical_joint" kp="80000" kv="6000" ctrlrange="0 0.85" forcerange="-4000 4000"/>
+    <motor name="left_fr3v2_1_joint1" joint="left_fr3v2_1_joint1" ctrlrange="-87 87"/>
+    <motor name="left_fr3v2_1_joint2" joint="left_fr3v2_1_joint2" ctrlrange="-87 87"/>
+    <motor name="left_fr3v2_1_joint3" joint="left_fr3v2_1_joint3" ctrlrange="-87 87"/>
+    <motor name="left_fr3v2_1_joint4" joint="left_fr3v2_1_joint4" ctrlrange="-87 87"/>
+    <motor name="left_fr3v2_1_joint5" joint="left_fr3v2_1_joint5" ctrlrange="-12 12"/>
+    <motor name="left_fr3v2_1_joint6" joint="left_fr3v2_1_joint6" ctrlrange="-12 12"/>
+    <motor name="left_fr3v2_1_joint7" joint="left_fr3v2_1_joint7" ctrlrange="-12 12"/>
+    <position name="left_fr3v2_1_finger_joint1" joint="left_fr3v2_1_finger_joint1" kp="3000" kv="60" ctrlrange="0 0.04" forcerange="-100 100"/>
+    <position name="left_fr3v2_1_finger_joint2" joint="left_fr3v2_1_finger_joint2" kp="3000" kv="60" ctrlrange="0 0.04" forcerange="-100 100"/>
+    <motor name="right_fr3v2_1_joint1" joint="right_fr3v2_1_joint1" ctrlrange="-87 87"/>
+    <motor name="right_fr3v2_1_joint2" joint="right_fr3v2_1_joint2" ctrlrange="-87 87"/>
+    <motor name="right_fr3v2_1_joint3" joint="right_fr3v2_1_joint3" ctrlrange="-87 87"/>
+    <motor name="right_fr3v2_1_joint4" joint="right_fr3v2_1_joint4" ctrlrange="-87 87"/>
+    <motor name="right_fr3v2_1_joint5" joint="right_fr3v2_1_joint5" ctrlrange="-12 12"/>
+    <motor name="right_fr3v2_1_joint6" joint="right_fr3v2_1_joint6" ctrlrange="-12 12"/>
+    <motor name="right_fr3v2_1_joint7" joint="right_fr3v2_1_joint7" ctrlrange="-12 12"/>
+    <position name="right_fr3v2_1_finger_joint1" joint="right_fr3v2_1_finger_joint1" kp="3000" kv="60" ctrlrange="0 0.04" forcerange="-100 100"/>
+    <position name="right_fr3v2_1_finger_joint2" joint="right_fr3v2_1_finger_joint2" kp="3000" kv="60" ctrlrange="0 0.04" forcerange="-100 100"/>
+  </actuator>
+  <sensor>
+    <framepos name="left_tcp_pos" objtype="site" objname="left_fr3v2_1_hand_tcp"/>
+    <framequat name="left_tcp_quat" objtype="site" objname="left_fr3v2_1_hand_tcp"/>
+    <framepos name="right_tcp_pos" objtype="site" objname="right_fr3v2_1_hand_tcp"/>
+    <framequat name="right_tcp_quat" objtype="site" objname="right_fr3v2_1_hand_tcp"/>
+    <framepos name="zed_left_pos" objtype="site" objname="zed_left_optical"/>
+    <framequat name="zed_left_quat" objtype="site" objname="zed_left_optical"/>
+  </sensor>
+  <keyframe>
+    <key name="ready" qpos="-1.04654438e-05 -9.96366806e-08 7.73959766e-06 0.376934 0.760768715 0.843252344 0.183301372 -1.56165238 2.1278196 3.76582234 1.05737822 0.0304159322 0.0295840678 -0.760771115 0.843261808 -0.183309542 -1.56165133 -2.12778347 3.76583609 0.513379363 0.0295840625 0.0304159375 1.262 -0.175 0.9265 1 0 0 0 1.262 -0.105 0.9265 1 0 0 0 1.262 0.035 0.9265 1 0 0 0 1.262 0.105 0.9265 1 0 0 0 1.262 0.175 0.9265 1 0 0 0 1.262 -0.175 1.0265 1 0 0 0 1.262 -0.035 1.0265 1 0 0 0 1.262 0.035 1.0265 1 0 0 0 1.262 0.175 1.0265 1 0 0 0 1.262 -0.07 0.7685 1 0 0 0 1.262 0.07 0.7685 1 0 0 0" ctrl="0 -0 -0 0.381561404 -31.5101599 -32.3092291 -17.0917279 6.82331435 -0.726861512 2.29602521 0.0420680074 0.03 0.03 31.1256819 -31.3286931 17.0170122 5.69519342 1.34485634 2.30830056 -0.110257389 0.03 0.03"/>
+  </keyframe>
+</mujoco>
